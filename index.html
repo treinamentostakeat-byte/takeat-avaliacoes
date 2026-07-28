@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Takeat — Plataforma de Avaliações</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#C8131B;--bg:#0b0b0b;--bg2:#131313;--bg3:#1c1c1c;--txt:#f0f0f0;--txt2:rgba(240,240,240,0.6);--txt3:rgba(240,240,240,0.3);--border:rgba(255,255,255,0.08)}
+html,body{min-height:100vh;background:var(--bg);font-family:'Inter',sans-serif;color:var(--txt)}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:0}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(200,19,27,0.08) 0%,transparent 65%)}
+.logo{height:42px;margin-bottom:40px;position:relative;z-index:1}
+h1{font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-1px;text-align:center;margin-bottom:10px;position:relative;z-index:1}
+h1 em{color:var(--red);font-style:normal}
+.sub{font-size:14px;color:var(--txt2);text-align:center;margin-bottom:48px;position:relative;z-index:1}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:600px;position:relative;z-index:1}
+@media(max-width:500px){.cards{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px 24px;text-decoration:none;color:inherit;transition:all .2s;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),rgba(200,19,27,0.2))}
+.card:hover{border-color:rgba(200,19,27,0.35);transform:translateY(-2px)}
+.card-icon{font-size:32px}
+.card-title{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.card-desc{font-size:13px;color:var(--txt2);line-height:1.55}
+.card-cta{margin-top:auto;font-size:12px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:5px}
+.footer{margin-top:40px;font-size:11px;color:var(--txt3);position:relative;z-index:1}
+.footer em{color:var(--red);font-style:normal;font-weight:700}
+</style>
+</head>
+<body>
+<img class="logo" src="data:image/png;base64,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" alt="Takeat">
+<h1>Plataforma de <em>Avaliações</em></h1>
+<p class="sub">Selecione a área que deseja acessar</p>
+<div class="cards">
+  <a class="card" href="takeat-avaliacao-cliente.html">
+    <div class="card-icon">⭐</div>
+    <div class="card-title">Avaliar Atendimento</div>
+    <div class="card-desc">Para restaurantes avaliarem a qualidade do suporte recebido da Takeat.</div>
+    <div class="card-cta">Acessar formulário →</div>
+  </a>
+  <a class="card" href="takeat-avaliacoes.html">
+    <div class="card-icon">📊</div>
+    <div class="card-title">Painel do Gestor</div>
+    <div class="card-desc">Visualize avaliações, ranking de colaboradores e cálculo de bônus.</div>
+    <div class="card-cta">Acessar painel →</div>
+  </a>
+</div>
+<div class="footer"><em>Takeat</em> · Plataforma interna de avaliações</div>
+</body>
+</html>
