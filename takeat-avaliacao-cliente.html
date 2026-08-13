@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Takeat — Avalie seu Atendimento</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C8131B;
+  --bg:#0b0b0b;--bg2:#131313;--bg3:#1c1c1c;
+  --txt:#f0f0f0;--txt2:rgba(240,240,240,0.55);--txt3:rgba(240,240,240,0.28);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.11);
+}
+html,body{
+  min-height:100vh;background:var(--bg);
+  font-family:'Inter',sans-serif;color:var(--txt);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 16px;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(200,19,27,0.07) 0%,transparent 65%);
+}
+
+.card{
+  position:relative;z-index:1;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:24px;overflow:hidden;
+  width:100%;max-width:400px;text-align:center;
+}
+.card-bar{height:3px;background:linear-gradient(90deg,var(--red),rgba(200,19,27,.2),transparent)}
+.card-body{padding:40px 32px 36px}
+
+.logo{height:36px;display:block;margin:0 auto 32px}
+
+.question{font-size:clamp(17px,4vw,22px);font-weight:800;letter-spacing:-.4px;line-height:1.3;margin-bottom:36px}
+.question em{color:var(--red);font-style:normal}
+
+/* CARINHAS */
+.faces{display:flex;justify-content:center;gap:20px;margin-bottom:32px}
+
+.face-btn{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:none;border:none;cursor:pointer;padding:0;
+  transition:transform .15s;
+}
+.face-btn:hover .face-circle{transform:scale(1.1)}
+.face-btn:active .face-circle{transform:scale(.94)}
+
+.face-circle{
+  width:80px;height:80px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:3px solid transparent;
+  transition:all .2s;
+  position:relative;
+}
+
+/* cores de cada carinha */
+.face-btn[data-v="1"] .face-circle{background:#3d1c1c;border-color:#7a2222}
+.face-btn[data-v="2"] .face-circle{background:#3a2e10;border-color:#7a6020}
+.face-btn[data-v="3"] .face-circle{background:#1a3520;border-color:#2d7a4a}
+
+/* selecionado */
+.face-btn[data-v="1"].sel .face-circle{background:#5c1f1f;border-color:#e05252;box-shadow:0 0 22px rgba(224,82,82,.35)}
+.face-btn[data-v="2"].sel .face-circle{background:#5a4510;border-color:#e0a030;box-shadow:0 0 22px rgba(224,160,48,.35)}
+.face-btn[data-v="3"].sel .face-circle{background:#1f5030;border-color:#3dbd6e;box-shadow:0 0 22px rgba(61,189,110,.35)}
+
+/* SVG carinhas */
+.face-circle svg{width:48px;height:48px}
+
+.face-label{
+  font-size:12px;font-weight:700;letter-spacing:.04em;
+  color:var(--txt3);transition:color .2s;
+}
+.face-btn[data-v="1"].sel .face-label{color:#e05252}
+.face-btn[data-v="2"].sel .face-label{color:#e0a030}
+.face-btn[data-v="3"].sel .face-label{color:#3dbd6e}
+
+/* SEPARADOR */
+.sep{height:1px;background:var(--border);margin-bottom:22px}
+
+/* COMENTÁRIO */
+.comment-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);display:block;text-align:left;margin-bottom:6px}
+textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;color:var(--txt);font-family:inherit;
+  font-size:14px;padding:11px 13px;resize:none;height:76px;
+  transition:border-color .15s;
+}
+textarea:focus{border-color:var(--red);outline:none}
+textarea::placeholder{color:var(--txt3)}
+
+/* BOTÃO */
+.send-btn{
+  width:100%;background:var(--red);color:#fff;
+  font-size:15px;font-weight:800;padding:14px;
+  border-radius:12px;border:none;cursor:pointer;
+  transition:all .2s;margin-top:16px;
+  opacity:.35;pointer-events:none;
+}
+.send-btn.ready{opacity:1;pointer-events:all}
+.send-btn.ready:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.send-btn.ready:active{transform:scale(.98)}
+
+.status{font-size:12px;color:var(--txt3);margin-top:8px;min-height:16px;text-align:center}
+.status.err{color:#ff7070}
+
+/* SUCESSO */
+.success{display:none}
+.s-ring{
+  width:76px;height:76px;border-radius:50%;
+  background:rgba(61,189,110,.1);border:2px solid rgba(61,189,110,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin:0 auto 18px;
+}
+.success h3{font-size:22px;font-weight:900;margin-bottom:8px}
+.success p{font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:22px}
+.nova-btn{
+  background:var(--bg3);color:var(--txt2);font-size:13px;font-weight:600;
+  padding:9px 22px;border-radius:10px;border:1px solid var(--border2);
+  cursor:pointer;transition:all .15s;
+}
+.nova-btn:hover{color:#fff;border-color:rgba(255,255,255,.2)}
+
+/* FOOTER */
+.footer{
+  position:relative;z-index:1;margin-top:18px;
+  font-size:11px;color:var(--txt3);
+  display:flex;align-items:center;gap:5px;
+}
+.footer em{color:var(--red);font-style:normal;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-bar"></div>
+  <div class="card-body">
+    <img class="logo" src="data:image/png;base64,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" alt="Takeat">
+
+    <!-- AVALIAÇÃO -->
+    <div id="main-wrap">
+      <p class="question">Como você classifica o <em>atendimento</em>?</p>
+
+      <div class="faces">
+
+        <!-- RUIM -->
+        <button class="face-btn" data-v="1" onclick="select(1)">
+          <div class="face-circle">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" fill="#c0392b" opacity=".9"/>
+              <circle cx="35" cy="38" r="6" fill="#fff"/>
+              <circle cx="65" cy="38" r="6" fill="#fff"/>
+              <path d="M32 68 Q50 54 68 68" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <span class="face-label">Ruim</span>
+        </button>
+
+        <!-- REGULAR -->
+        <button class="face-btn" data-v="2" onclick="select(2)">
+          <div class="face-circle">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" fill="#d4881a" opacity=".9"/>
+              <circle cx="35" cy="38" r="6" fill="#fff"/>
+              <circle cx="65" cy="38" r="6" fill="#fff"/>
+              <line x1="32" y1="65" x2="68" y2="65" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="face-label">Regular</span>
+        </button>
+
+        <!-- ÓTIMO -->
+        <button class="face-btn" data-v="3" onclick="select(3)">
+          <div class="face-circle">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" fill="#27ae60" opacity=".9"/>
+              <circle cx="35" cy="38" r="6" fill="#fff"/>
+              <circle cx="65" cy="38" r="6" fill="#fff"/>
+              <path d="M32 58 Q50 76 68 58" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <span class="face-label">Ótimo</span>
+        </button>
+
+      </div>
+
+      <div class="sep"></div>
+
+      <label class="comment-label">Comentário (opcional)</label>
+      <textarea id="f-coment" placeholder="Conta como foi o seu atendimento…"></textarea>
+
+      <button class="send-btn" id="send-btn" onclick="enviar()">Enviar avaliação</button>
+      <div class="status" id="status-msg"></div>
+    </div>
+
+    <!-- SUCESSO -->
+    <div class="success" id="success-wrap">
+      <div class="s-ring">🎉</div>
+      <h3>Obrigado!</h3>
+      <p>Sua avaliação foi registrada com sucesso. Isso nos ajuda a melhorar cada vez mais!</p>
+      <button class="nova-btn" onclick="reset()">Avaliar novamente</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Plataforma segura · <em>Takeat</em>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyBwJT4fsTdOIMyb8Ju55WoLheZRsvYv4kw",
+  authDomain: "takeat-avaliacoes.firebaseapp.com",
+  projectId: "takeat-avaliacoes",
+  storageBucket: "takeat-avaliacoes.firebasestorage.app",
+  messagingSenderId: "516277196228",
+  appId: "1:516277196228:web:0867685e6df5030008c091"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+window._salvar = async function(av){
+  await addDoc(collection(db,"avaliacoes"),{...av,criadoEm:serverTimestamp()});
+};
+</script>
+
+<script>
+var nota = 0;
+var LABELS = {1:'Ruim', 2:'Regular', 3:'Ótimo'};
+
+function select(n){
+  nota = n;
+  document.querySelectorAll('.face-btn').forEach(function(b){
+    b.classList.toggle('sel', parseInt(b.dataset.v) === n);
+  });
+  document.getElementById('send-btn').classList.add('ready');
+}
+
+async function enviar(){
+  if(!nota) return;
+  var btn = document.getElementById('send-btn');
+  var msg = document.getElementById('status-msg');
+  btn.classList.remove('ready');
+  btn.textContent = 'Enviando…';
+
+  var av = {
+    nota: nota,
+    label: LABELS[nota],
+    comentario: document.getElementById('f-coment').value.trim(),
+    data: new Date().toISOString().split('T')[0]
+  };
+
+  try{
+    if(typeof window._salvar !== 'function'){
+      await new Promise(function(r){setTimeout(r,2000);});
+    }
+    await window._salvar(av);
+    document.getElementById('main-wrap').style.display = 'none';
+    document.getElementById('success-wrap').style.display = 'block';
+  }catch(e){
+    msg.textContent = 'Erro ao enviar. Tente novamente.';
+    msg.className = 'status err';
+    btn.textContent = 'Enviar avaliação';
+    btn.classList.add('ready');
+    console.error(e);
+  }
+}
+
+function reset(){
+  nota = 0;
+  document.querySelectorAll('.face-btn').forEach(function(b){b.classList.remove('sel');});
+  document.getElementById('f-coment').value = '';
+  document.getElementById('send-btn').classList.remove('ready');
+  document.getElementById('send-btn').textContent = 'Enviar avaliação';
+  document.getElementById('status-msg').textContent = '';
+  document.getElementById('main-wrap').style.display = 'block';
+  document.getElementById('success-wrap').style.display = 'none';
+}
+</script>
+</body>
+</html>
